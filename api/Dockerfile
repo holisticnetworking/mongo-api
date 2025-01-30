@@ -24,7 +24,14 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 	file \
 	gettext \
 	git \
+    vim \
 	&& rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install --no-install-recommends -y \
+	libcurl4-openssl-dev \
+    libssl-dev \
+    && pecl install mongodb \
+    && docker-php-ext-enable mongodb
 
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
 ENV COMPOSER_ALLOW_SUPERUSER=1
@@ -69,6 +76,8 @@ RUN set -eux; \
 
 COPY --link frankenphp/conf.d/app.dev.ini $PHP_INI_DIR/conf.d/
 
+SHELL ["/bin/bash", "-c"]
+
 CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile", "--watch" ]
 
 # Prod FrankenPHP image
@@ -97,9 +106,3 @@ RUN set -eux; \
 	composer dump-env prod; \
 	composer run-script --no-dev post-install-cmd; \
 	chmod +x bin/console; sync;
-
-RUN apt-get update && apt-get install --no-install-recommends -y \
-	libcurl4-openssl-dev \
-    libssl-dev \
-    && pecl install mongodb \
-    && docker-php-ext-enable mongodb

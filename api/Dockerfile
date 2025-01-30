@@ -97,3 +97,9 @@ RUN set -eux; \
 	composer dump-env prod; \
 	composer run-script --no-dev post-install-cmd; \
 	chmod +x bin/console; sync;
+
+RUN apt-get update && apt-get install --no-install-recommends -y \
+	libcurl4-openssl-dev \
+    libssl-dev \
+    && pecl install mongodb \
+    && docker-php-ext-enable mongodb
